@@ -1,7 +1,8 @@
 import sys, os
 import time
+import platform
 
-
+PAUSE = "pause" if platform.system() == "Windows" else "read var"
 
 path = sys.argv[1]
 
@@ -14,14 +15,14 @@ iPath = os.path.join(path, "src")
 
 if not os.path.exists(iPath):
     print("Error: Could not find './src/'")
-    os.system("pause")
+    os.system(PAUSE)
     exit()
 
 pFile = os.path.join(iPath, file)
 
 if not os.path.exists(pFile):
     print("Error: Could not find './src/index.js'")
-    os.system("pause")
+    os.system(PAUSE)
     exit()
 
 lu = 0
@@ -38,7 +39,7 @@ while 1:
             iFile = open(pFile, "r").read()
         else:
             print("Error: Could not find './src/index.js'")
-            os.system("pause")
+            os.system(PAUSE)
             continue
 
         iFile = iFile.split("\n")
@@ -56,7 +57,7 @@ while 1:
 
         if not appIndex:
             print("Error: Could not find the 'app' object in './src/index.js'")
-            os.system("pause")
+            os.system(PAUSE)
             continue
 
         sep = []
