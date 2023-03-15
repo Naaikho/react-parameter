@@ -78,12 +78,9 @@ while 1:
         params = []
 
         for l in iFile:
-            l = l.strip()
+            l = "".join(l.split(" ")).strip()
             if(("const[" in l or "const [" in l) and not l.strip().startswith("//")):
                 l = l.split("=")[0].strip()
-                if l.startswith("const["):
-                    l = l[5:]
-                l = " ".join(l.split(" ")[1:]).strip()
                 l = l.split("[")[1].split("]")[0].strip().split(",")
                 l = [x.strip() for x in l]
                 if l[0] != "":
