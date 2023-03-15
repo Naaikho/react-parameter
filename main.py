@@ -78,12 +78,17 @@ while 1:
 
         for l in iFile:
             l = l.strip()
-            if(("const[" in l or "const [" in l) and not l.startswith("//")):
-                l = " ".join(l.split("=")[0].split(" ")[1:]).strip()
+            if(("const[" in l or "const [" in l) and not l.strip().startswith("//")):
+                l = l.split("=")[0].strip()
+                if l.startswith("const["):
+                    l = l[5:]
+                l = " ".join(l.split(" ")[1:]).strip()
                 l = l.split("[")[1].split("]")[0].strip().split(",")
                 l = [x.strip() for x in l]
-                params.append(l[0])
-                params.append(l[1])
+                if l[0] != "":
+                    params.append(l[0])
+                if l[1] != "":
+                    params.append(l[1])
 
         app = (" " * spaceNb) + "const app = {" + ",".join(params) + "};"
 
