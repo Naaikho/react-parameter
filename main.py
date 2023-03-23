@@ -3,6 +3,7 @@ import time
 import platform
 
 PAUSE = "pause" if platform.system() == "Windows" else "read var"
+CLEAR = "cls" if platform.system() == "Windows" else "clear"
 
 path = sys.argv[1]
 
@@ -30,7 +31,7 @@ lu = 0
 while 1:
     # if file is edited, enter in condition
     if os.path.getmtime(pFile) > lu:
-        os.system("cls")
+        os.system(CLEAR)
         print("React Parameters initialized")
         print("")
         print("Last update: " + time.strftime("%H:%M:%S"))
