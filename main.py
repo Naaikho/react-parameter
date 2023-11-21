@@ -1,7 +1,9 @@
 import sys, os
 import time
+import platform
 
-
+PAUSE = "pause" if platform.system() == "Windows" else "read var"
+CLEAR = "cls" if platform.system() == "Windows" else "clear"
 
 path = sys.argv[1]
 
@@ -14,14 +16,14 @@ iPath = os.path.join(path, "src")
 
 if not os.path.exists(iPath):
   print("Error: Could not find './src/'")
-  os.system("pause")
+  os.system(PAUSE)
   exit()
 
 pFile = os.path.join(iPath, file)
 
 if not os.path.exists(pFile):
   print("Error: Could not find './src/index.js'")
-  os.system("pause")
+  os.system(PAUSE)
   exit()
 
 lu = 0
@@ -29,7 +31,7 @@ lu = 0
 while 1:
   # if file is edited, enter in condition
   if os.path.getmtime(pFile) > lu:
-    os.system("cls")
+    os.system(CLEAR)
     print("React Parameters initialized")
     print("")
     print("Last update: " + time.strftime("%H:%M:%S"))
@@ -38,7 +40,7 @@ while 1:
       iFile = open(pFile, "r").read()
     else:
       print("Error: Could not find './src/index.js'")
-      os.system("pause")
+      os.system(PAUSE)
       continue
 
     iFile = iFile.split("\n")
@@ -54,10 +56,10 @@ while 1:
         spaceNb = iFile[i].index("const")
         break
 
-    if not appIndex:
-      print("Error: Could not find the 'app' object in './src/index.js'")
-      os.system("pause")
-      continue
+        if not appIndex:
+          print("Error: Could not find the 'app' object in './src/index.js'")
+          os.system(PAUSE)
+          continue
 
     sep = []
     closeIndex = -1
@@ -77,13 +79,15 @@ while 1:
     params = []
 
     for l in iFile:
-      l = l.strip()
-      if(("const[" in l or "const [" in l) and not l.startswith("//")):
-        l = " ".join(l.split("=")[0].split(" ")[1:]).strip()
+      l = "".join(l.split(" ")).strip()
+      if(("const[" in l or "const [" in l) and not l.strip().startswith("//")):
+        l = l.split("=")[0].strip()
         l = l.split("[")[1].split("]")[0].strip().split(",")
         l = [x.strip() for x in l]
-        params.append(l[0])
-        params.append(l[1])
+        if l[0] != "":
+          params.append(l[0])
+        if l[1] != "":
+          params.append(l[1])
 
     app = (" " * spaceNb) + "const app{} = {".format((": any" if file.endswith(("tsx", "ts")) else "")) + ",".join(params) + "};"
 
