@@ -1,6 +1,7 @@
 import sys, os
 import time
 import platform
+from typing import Union
 
 PAUSE = "pause" if platform.system() == "Windows" else "read var"
 CLEAR = "cls" if platform.system() == "Windows" else "clear"
@@ -48,7 +49,7 @@ while 1:
     app = []
 
     # found const app = {...} in file
-    appIndex = -1
+    appIndex = 0
     spaceNb = 0
     for i in range(len(iFile)):
       if("const app" in iFile[i]):
@@ -56,11 +57,12 @@ while 1:
         spaceNb = iFile[i].index("const")
         break
 
-        if not appIndex:
-          print("Error: Could not find the 'app' object in './src/index.js'")
-          os.system(PAUSE)
-          continue
+    if not appIndex:
+      print("Error: Could not find the 'app' object in './src/index.js'")
+      os.system(PAUSE)
+      continue
 
+    # found end of consr app = {...} in file (if the const is not on one line)
     sep = []
     closeIndex = -1
     if not "}" in iFile[appIndex]:
@@ -74,29 +76,49 @@ while 1:
       sep.append(iFile[0:appIndex])
       sep.append(iFile[appIndex+1:])
 
-    # print(sep)
-
+    # found all parameters in const app = {...} in file and put them in params list
     params = []
-
     for l in iFile:
       l = "".join(l.split(" ")).strip()
+      types = "any"
       if(("const[" in l or "const [" in l) and not l.strip().startswith("//")):
+        if file.endswith(("tsx", "ts")) and "<" in l and ">" in l:
+          # split and keep the types between firsts "<" and ">" (to catch Component<Array<Type>>() for example)
+          types: str = ">".join("<".join(l.split("<")[1:]).split(">")[:-1])
         l = l.split("=")[0].strip()
         l = l.split("[")[1].split("]")[0].strip().split(",")
         l = [x.strip() for x in l]
         if l[0] != "":
-          params.append(l[0])
+          params.append({
+            "var": l[0],
+            "type": types
+          })
         if l[1] != "":
-          params.append(l[1])
+          params.append({
+            "var": l[1],
+            "type": f"React.Dispatch<React.SetStateAction<{types}>>"
+          })
 
-    app = (" " * spaceNb) + "const app{}".format((": any" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join(params) + "};"
+    # format params list to make new interface with all parameters and types
+    interfaceContent = None
+    if(params and file.endswith(("tsx", "ts"))):
+      interfaceContent = ["{}: {}".format(x["var"], x["type"] if x["type"] else "any") for x in params]
+      interfaceContent = "import React from 'react';\n\nexport interface NkContext {\n  " + ",\n  ".join(interfaceContent) + "\n}\n"
 
+    # format params list to become new const app = {...} in file
+    app = (" " * spaceNb) + "const app{}".format((": NkContext" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
+
+    # include new const app = {...} in file
     nFile = "\n".join(sep[0] + [app] + sep[1])
 
-    # print(nFile)
-
+    # write file
     open(pFile, "w").write(nFile)
+    if(interfaceContent):
+      if not os.path.exists(os.path.join(path, "types")):
+        os.mkdir(os.path.join(path, "types"))
+      open(os.path.join(path, "types", "nkContext.types.ts"), "w").write(interfaceContent)
 
+    # update last update time
     lu = os.path.getmtime(pFile)
 
   time.sleep(0.5)
