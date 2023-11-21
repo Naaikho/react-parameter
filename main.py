@@ -89,7 +89,7 @@ while 1:
         if l[1] != "":
           params.append(l[1])
 
-    app = (" " * spaceNb) + "const app{} = {".format((": any" if file.endswith(("tsx", "ts")) else "")) + ",".join(params) + "};"
+    app = (" " * spaceNb) + "const app{}".format((": any" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join(params) + "};"
 
     nFile = "\n".join(sep[0] + [app] + sep[1])
 
