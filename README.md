@@ -1,7 +1,7 @@
 # React Parameter
 
-React Parameter is a small Python script to automate and facilitate the creation of contextual variables with React (JSX & TSX).
-It scans your `index` file and retrieves all the constant states (with double brackets `[ ]`) then brings them together by creating a variable called `app` in your file (your `index` file must be in your `./src` folder).
+React Parameter is a small Python script to **automate and facilitate the creation and updating of contextual variables in <ins>real time</ins> with React** (JSX & TSX).
+It scans your `index` file and retrieves all the constant states (with double brackets `[ ]`) then reassembles them by creating a variable called `app` in your file each time you save it (your `index` file must be in your `./src` folder).
 Think carefully about setting up your environment so that the context is spread correctly.
 
 ## Typescript
