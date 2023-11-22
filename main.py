@@ -104,7 +104,7 @@ while 1:
     if(params and file.endswith(("tsx", "ts"))):
       interfaceContent = ["{}: {}".format(x["var"], x["type"] if x["type"] else "any") for x in params]
       interfaceContent.append("[key: string]: any;")
-      interfaceContent = "import React from 'react';\n\nexport interface NkContext {\n  " + ";\n  ".join(interfaceContent) + "\n}\n"
+      interfaceContent = "export interface NkContext {\n  " + ";\n  ".join(interfaceContent) + "\n}\n"
 
     # format params list to become new const app = {...} in file
     app = (" " * spaceNb) + "const app{}".format((": NkContext" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
@@ -115,9 +115,15 @@ while 1:
     # write file
     open(pFile, "w").write(nFile)
     if(interfaceContent):
+      imports = ""
+      contextTypepath = os.path.join(iPath, "types", "nkContext.types.ts")
       if not os.path.exists(os.path.join(iPath, "types")):
         os.mkdir(os.path.join(iPath, "types"))
-      open(os.path.join(iPath, "types", "nkContext.types.ts"), "w").write(interfaceContent)
+      if os.path.exists(contextTypepath):
+        imports = open(contextTypepath, "r").read().split("\n")
+        imports = [x for x in imports if x.startswith("import")]
+        imports = "\n".join(imports) + "\n\n"
+      open(os.path.join(iPath, "types", "nkContext.types.ts"), "w").write(imports + interfaceContent)
 
     # update last update time
     lu = os.path.getmtime(pFile)
