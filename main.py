@@ -23,7 +23,7 @@ if not os.path.exists(iPath):
 pFile = os.path.join(iPath, file)
 
 if not os.path.exists(pFile):
-  print("Error: Could not find './src/index.js'")
+  print("Error: Could not find './src/" + file + "'")
   os.system(PAUSE)
   exit()
 
