@@ -42,7 +42,7 @@ while 1:
     if os.path.exists(pFile):
       iFile = open(pFile, "r").read()
     else:
-      print("Error: Could not find './src/index.js'")
+      print(f"Error: Could not find './src/{file}'")
       os.system(PAUSE)
       continue
 
@@ -60,7 +60,7 @@ while 1:
         break
 
     if not appIndex:
-      print("Error: Could not find the 'app' object in './src/index.js'")
+      print(f"Error: Could not find the constant 'app' object in './src/{file}'")
       os.system(PAUSE)
       continue
 
@@ -116,7 +116,7 @@ while 1:
       interfaceContent = "export interface NkContext extends NkContextVariant {\n  " + ";\n  ".join(interfaceContent) + "\n}\n"
 
     # format params list to become new const app = {...} in file
-    app = (" " * spaceNb) + "const app{}".format((": NkContext" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
+    app = (" " * spaceNb) + "const app{}".format((": Partial<NkContext>" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
 
     # include new const app = {...} in file
     nFile = "\n".join(sep[0] + [app] + sep[1])
