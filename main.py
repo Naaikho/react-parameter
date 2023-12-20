@@ -27,6 +27,8 @@ if not os.path.exists(pFile):
   os.system(PAUSE)
   exit()
 
+os.system("title=React Parameters")
+
 lu = 0
 
 while 1:
@@ -79,15 +81,22 @@ while 1:
     # found all parameters in const app = {...} in file and put them in params list
     params = []
     for l in iFile:
+      # if line index is under const app = {...} index, continue
+      if(iFile.index(l) > appIndex):
+        continue
       l = "".join(l.split(" ")).strip()
       types = "any"
       if(("const[" in l or "const [" in l) and not l.strip().startswith("//")):
+        if not "useState" in l:
+          continue
         if file.endswith(("tsx", "ts")) and "<" in l and ">" in l:
           # split and keep the types between firsts "<" and ">" (to catch Component<Array<Type>>() for example)
           types: str = ">".join("<".join(l.split("<")[1:]).split(">")[:-1])
         l = l.split("=")[0].strip()
         l = l.split("[")[1].split("]")[0].strip().split(",")
         l = [x.strip() for x in l]
+        if len(l) != 2:
+          continue
         if l[0] != "":
           params.append({
             "var": l[0],
@@ -103,8 +112,8 @@ while 1:
     interfaceContent = None
     if(params and file.endswith(("tsx", "ts"))):
       interfaceContent = ["{}: {}".format(x["var"], x["type"] if x["type"] else "any") for x in params]
-      interfaceContent.append("[key: string]: any;")
-      interfaceContent = "export interface NkContext {\n  " + ";\n  ".join(interfaceContent) + "\n}\n"
+      # interfaceContent.append("[key: string]: any;")
+      interfaceContent = "export interface NkContext extends NkContextVariant {\n  " + ";\n  ".join(interfaceContent) + "\n}\n"
 
     # format params list to become new const app = {...} in file
     app = (" " * spaceNb) + "const app{}".format((": NkContext" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
@@ -116,12 +125,18 @@ while 1:
     open(pFile, "w").write(nFile)
     if(interfaceContent):
       imports = ""
+      contextVariant = os.path.join(iPath, "types", "nkContextVariant.types.ts")
       contextTypepath = os.path.join(iPath, "types", "nkContext.types.ts")
       if not os.path.exists(os.path.join(iPath, "types")):
         os.mkdir(os.path.join(iPath, "types"))
+      if not os.path.exists(contextVariant):
+        open(contextVariant, "w").write("export interface NkContextVariant {\n\t\n}\n")
       if os.path.exists(contextTypepath):
+        importVariant = "import { NkContextVariant } from './nkContextVariant.types';"
         imports = open(contextTypepath, "r").read().split("\n")
         imports = [x for x in imports if x.startswith("import")]
+        if not importVariant in imports:
+          imports.append(importVariant)
         imports = "\n".join(imports) + "\n\n"
       open(os.path.join(iPath, "types", "nkContext.types.ts"), "w").write(imports + interfaceContent)
 
