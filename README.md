@@ -5,7 +5,7 @@ It scans your `index` file and retrieves all the constant states (with double br
 Think carefully about setting up your environment so that the context is spread correctly.
 
 ## Typescript
-If you use Typescript, RP will retrieve the types of your states then create an interface (named `NkContext`) allowing you to keep the type and properties of your states everywhere in your project (you will simply need to place a typing of `NkContext` in front of each instactiation of `const app`)
+If you use Typescript, RP will retrieve the types of your states then create an interface (named `NkContext`) allowing you to keep the type and properties of your states everywhere in your project, it also creates an `NkContextVariant` typing component in order to add custom properties to the `NkContext` by extends. (you will simply need to place a typing of `NkContext` in front of each instactiation of `const app`)
 If your state has no type, it will automatically be set to `any`.
 
 ## Setup
