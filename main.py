@@ -116,7 +116,7 @@ while 1:
       interfaceContent = "export interface NkContext extends NkContextVariant {\n  " + ";\n  ".join(interfaceContent) + "\n}\n"
 
     # format params list to become new const app = {...} in file
-    app = (" " * spaceNb) + "const app{}".format((": Partial<NkContext>" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
+    app = ("\t" * spaceNb) + "const app{}".format((": Partial<NkContext>" if file.endswith(("tsx", "ts")) else "")) + " = {" + ",".join([x["var"] for x in params]) + "};"
 
     # include new const app = {...} in file
     nFile = "\n".join(sep[0] + [app] + sep[1])
